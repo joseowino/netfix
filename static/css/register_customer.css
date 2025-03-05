@@ -1,0 +1,119 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --text-color: #343a40;
+    --card-background: #ffffff;
+    --card-border: 1px solid #dee2e6;
+    --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.register-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: var(--card-background);
+    border: var(--card-border);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+}
+
+.register-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group input[type="file"],
+.form-group input[type="date"] {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 6px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group input[type="date"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-group input[type="file"] {
+    padding: 8px;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.register-button {
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.register-button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .register-title {
+        font-size: 24px;
+    }
+
+    .form-group input,
+    .form-group input[type="date"] {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .register-button {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}

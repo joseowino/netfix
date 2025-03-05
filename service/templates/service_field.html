@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ field }} Services</h1>
+
+<div class="service-list">
+    {% for service in services %}
+        <div class="service-item">
+            <h2>{{ service.title }}</h2>
+            <p>{{ service.description|truncatewords:20 }}</p>
+            <p><strong>Field:</strong> {{ service.field }}</p>
+            <p><strong>Created By:</strong> {{ service.company.user.username }}</p>
+
+            <a href="{% url 'services:service_detail' service.id %}">View Details</a>
+            <a href="{% url 'services:request_service' service.id %}">Request Service</a>
+        </div>
+    {% empty %}
+        <p>No services available in this category.</p>
+    {% endfor %}
+</div>
+{% endblock %}

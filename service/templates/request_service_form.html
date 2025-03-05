@@ -1,0 +1,146 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Request Service{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --background-color: #f8f9fa;
+        --text-color: #343a40;
+        --card-background: #ffffff;
+        --card-border: 1px solid #e0e0e0;
+        --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+    }
+
+    .request-service-container {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 50px;
+        background-color: var(--card-background);
+        border: var(--card-border);
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .request-service-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .request-service-header h2 {
+        font-size: 32px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .request-service-form {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .request-service-form p {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .request-service-form label {
+        font-size: 16px;
+        font-weight: bold;
+        color: var(--text-color);
+        margin-right: 10px;
+        min-width: 120px; /* Fixed width for labels */
+    }
+
+    .request-service-form input[type="text"],
+    .request-service-form input[type="number"] {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid var(--secondary-color);
+        border-radius: 4px;
+        background-color: var(--card-background);
+        color: var(--text-color);
+    }
+
+    .request-service-form input[type="text"]::placeholder,
+    .request-service-form input[type="number"]::placeholder {
+        color: var(--secondary-color);
+    }
+
+    .details-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        text-align: center;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+        width: 100%; /* Full width for the button */
+    }
+
+    .details-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .request-service-container {
+            padding: 20px;
+        }
+
+        .request-service-header h2 {
+            font-size: 28px;
+        }
+
+        .request-service-form p {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .request-service-form label {
+            margin-bottom: 5px;
+        }
+
+        .request-service-form input[type="text"],
+        .request-service-form input[type="number"] {
+            width: 100%;
+        }
+
+        .details-button {
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- <div class="request-service-container"> -->
+    <div class="request-service-header">
+        <h2>Request Service</h2>
+    </div>
+    <form method="post" class="request-service-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="details-button">Request</button>
+    </form>
+<!-- </div> -->
+{% endblock %}

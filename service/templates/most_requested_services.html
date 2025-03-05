@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+{% block title %}Most Requested Services{% endblock %}
+{% block content %}
+    <h1>Most Requested Services</h1>
+    <ul>
+        {% for service in services %}
+            <li>
+                <a href="{% url 'services:service_detail' service.id %}">{{ service.name }}</a>
+                - {{ service.field }} - ${{ service.price_hour }} per hour
+                <br>
+                Provided by: <a href="{% url 'users:company_profile' username=service.company.user.username %}">{{ service.company.user.username }}</a>
+                <br>
+                Requests: {{ service.request_count }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

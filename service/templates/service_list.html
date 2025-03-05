@@ -1,0 +1,166 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --background-color: #f8f9fa;
+        --text-color: #343a40;
+        --card-background: #ffffff;
+        --card-border: 1px solid #e0e0e0;
+        --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+    }
+
+    .services-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .service-card {
+        background-color: var(--card-background);
+        border: var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .service-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .service-description {
+        font-size: 14px;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+    }
+
+    .service-field, .service-company {
+        font-size: 14px;
+        color: var(--text-color);
+        margin-bottom: 8px;
+    }
+
+    .service-company a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .service-company a:hover {
+        text-decoration: underline;
+    }
+
+    .service-actions {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-details, .btn-request, .btn-login {
+        display: inline-block;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-details {
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+
+    .btn-details:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-request {
+        background-color: #162c76;
+        color: #fff;
+    }
+
+    .btn-request:hover {
+        background-color: #313ea5;
+    }
+
+    .btn-login {
+        background-color: var(--secondary-color);
+        color: #fff;
+    }
+
+    .btn-login:hover {
+        background-color: #5a6268;
+    }
+
+    .no-services {
+        text-align: center;
+        font-size: 18px;
+        color: var(--secondary-color);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .services-container {
+            grid-template-columns: 1fr;
+        }
+
+        .service-name {
+            font-size: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="services-container">
+    {% for service in services %}
+    <div class="service-card">
+        <h2 class="service-name">{{ service.name }}</h2>
+        <p class="service-description">{{ service.description|truncatewords:20 }}</p>
+        <p class="service-field"><strong>Field:</strong> {{ service.field }}</p>
+        <p class="service-company">
+            <strong>Created By:</strong>
+            <a href="{% url 'users:company_profile' username=service.company.user.username %}">
+                {{ service.company.user.username }}
+            </a>
+        </p>
+
+        <div class="service-actions">
+            <a href="{% url 'services:service_detail' service.id %}" class="btn-details">View Details</a>
+
+            {% if user.is_authenticated and user.is_customer %}
+                <a href="{% url 'services:request_service' service.id %}" class="btn-request">Request Service</a>
+            {% else %}
+                <p class="login-prompt"><a href="{% url 'users:login_user' %}" class="btn-login">Login to request service</a></p>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p class="no-services">No services available.</p>
+    {% endfor %}
+</div>
+{% endblock %}

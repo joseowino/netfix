@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Create Service{% endblock %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'services/css/createservice.css' %}">
+    
+    <div class="form-container">
+        <h2>Create Service</h2>
+        <form method="post" class="service-form">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="details-button">Create</button>
+        </form>
+    </div>
+{% endblock %}

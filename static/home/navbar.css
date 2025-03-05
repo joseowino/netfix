@@ -1,0 +1,76 @@
+:root {
+    --navbar-bg: #ffffff;
+    --navbar-text: #343a40;
+    --navbar-hover: #007bff;
+    --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --footer-bg: #f8f9fa;
+    --footer-text: #6c757d;
+}
+
+/* Ensure the body and html take up the full height */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar styles */
+.navbar {
+    background-color: var(--navbar-bg);
+    box-shadow: var(--navbar-shadow);
+    padding: 10px 20px;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.navbar-left, .navbar-right {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-left li, .navbar-right li {
+    margin: 0 10px;
+}
+
+.navbar-link {
+    text-decoration: none;
+    color: var(--navbar-text);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar-link:hover {
+    background-color: var(--navbar-hover);
+    color: #ffffff;
+}
+
+/* Main Content */
+.content {
+    flex: 1;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Footer */
+footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    text-align: center;
+    padding: 10px 0;
+    margin-top: auto; /* Push footer to the bottom */
+}

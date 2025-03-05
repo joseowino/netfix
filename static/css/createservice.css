@@ -1,0 +1,133 @@
+/* General Styles for consistency across all forms */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    font-size: 2em;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.service-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Style form fields */
+input[type="text"], input[type="number"], input[type="email"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, textarea:focus {
+    border-color: #0066cc;
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Button styling */
+.details-button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    border-radius: 30px; /* Make the button more rounded */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover effect for the button */
+.details-button:hover {
+    background-color: #005bb5;
+    transform: scale(1.05); /* Slight scaling effect on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container {
+        width: 90%;
+        padding: 15px;
+    }
+}
+
+/* Label Styling */
+label {
+    font-size: 1.1em; /* Slightly larger font for readability */
+    color: #333; /* Dark color for contrast */
+    font-weight: bold; /* Bold for emphasis */
+    margin-bottom: 8px; /* Add space between the label and input field */
+    display: block; /* Makes the label block-level element, so it occupies full width */
+    text-align: left;
+    transition: color 0.3s ease;
+}
+
+/* When focusing on the input field, change label color */
+input[type="text"]:focus + label,
+input[type="email"]:focus + label,
+input[type="number"]:focus + label,
+textarea:focus + label {
+    color: #0066cc; /* Blue color when the user focuses on the field */
+}
+
+/* Label Hover Effect */
+input[type="text"]:hover + label,
+input[type="email"]:hover + label,
+input[type="number"]:hover + label,
+textarea:hover + label {
+    color: #005bb5; /* Darker shade of blue on hover */
+}
+
+/* Input fields style */
+input[type="text"], input[type="number"], input[type="email"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+/* For input focus effect */
+input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, textarea:focus {
+    border-color: #0066cc;
+    outline: none;
+}
+
+/* Adding a slight margin to inputs */
+input[type="text"], input[type="number"], input[type="email"], textarea {
+    margin-bottom: 10px; /* Space between input and button */
+}
+
+/* Additional styling for textarea to make it more user-friendly */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}

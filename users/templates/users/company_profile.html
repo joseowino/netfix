@@ -1,0 +1,218 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --background-color: #f8f9fa;
+        --text-color: #343a40;
+        --card-background: #ffffff;
+        --card-border: 1px solid #e0e0e0;
+        --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+    }
+
+    .company-profile-container {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 50px;
+        background-color: var(--card-background);
+        border: var(--card-border);
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .company-profile-header {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .company-profile-image {
+        width: 200px;
+        height: 200px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 3px solid var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    .image-placeholder {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    background-color: var(--secondary-color); /* Background color for the placeholder */
+    border: 3px solid var(--primary-color); /* Border color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px; /* Center the placeholder */
+}
+
+.image-placeholder p {
+    color: var(--card-background); /* Ensure text color contrasts with the background */
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0; /* Remove default margin */
+}
+
+    .company-profile-header h1 {
+        font-size: 32px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .company-profile-header p {
+        font-size: 16px;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+    }
+
+    .details-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .details-button:hover {
+        background-color: #0056b3;
+    }
+
+    .services-section {
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--text-color);
+        margin-bottom: 20px;
+    }
+
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .service-card {
+        background-color: var(--card-background);
+        border: var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .service-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .service-name a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .service-name a:hover {
+        text-decoration: underline;
+    }
+
+    .service-field, .service-price, .service-provider, .service-details {
+        font-size: 14px;
+        color: var(--secondary-color);
+        margin-bottom: 8px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .company-profile-container {
+            padding: 20px;
+        }
+
+        .company-profile-header h1 {
+            font-size: 28px;
+        }
+
+        .company-profile-header p {
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 20px;
+        }
+
+        .cards-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- <div class="company-profile-container"> -->
+    <div class="company-profile-header">
+        {% if profile.profile_image %}
+            <img src="{{ profile.profile_image.url }}" alt="Company Image" class="company-profile-image">
+        {% else %}
+            <div class="image-placeholder">
+                <p>Upload Image</p>
+            </div>
+        {% endif %}
+        <h1>{{ user.username }}'s Profile</h1>
+        <p>Email: {{ user.email }}</p>
+        <p>Field of Work: {{ profile.field }}</p>
+        {% if user.is_company and is_company_owner %}
+            <a href="{% url 'users:update_profile_image' %}" class="details-button">Update Profile Image</a>
+        {% endif %}
+    </div>
+
+    <div class="services-section">
+        <h2 class="section-title">Services Provided</h2>
+        <div class="cards-container">
+            {% for service in services %}
+            <div class="service-card">
+                <h3 class="service-name"><a href="{% url 'services:service_detail' service.id %}">{{ service.name }}</a></h3>
+                <p class="service-field"><strong>Field:</strong> {{ service.field }}</p>
+                <p class="service-price"><strong>Price:</strong> ${{ service.price_hour }} per hour</p>
+                <p class="service-provider"><strong>Provider:</strong> {{ service.company.user.username }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if user.is_company and is_company_owner %}
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{% url 'services:service_create' %}" class="details-button">Create New Service</a>
+        </div>
+    {% endif %}
+<!-- </div> -->
+{% endblock %}

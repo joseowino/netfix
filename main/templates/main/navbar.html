@@ -1,0 +1,237 @@
+<nav class="navbar">
+    <style>
+        :root {
+            --navbar-bg: var(--navbar-brand-color);
+            --navbar-text: #343a40;
+            --navbar-hover: #94a9c0;
+            --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --navbar-brand-color: #94a9c0;
+            --navbar-toggler-color: #94a9c0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--navbar-bg);
+            box-shadow: var(--navbar-shadow);
+            padding: 10px 20px;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Brand/Logo */
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--navbar-brand-color);
+            text-decoration: none;
+        }
+
+        /* Hamburger Menu (Mobile) */
+        .navbar-toggler {
+            display: none; /* Hidden by default */
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .navbar-toggler-icon {
+            width: 24px;
+            height: 24px;
+            background-color: var(--navbar-toggler-color);
+            display: block;
+            position: relative;
+        }
+
+        .navbar-toggler-icon::before,
+        .navbar-toggler-icon::after {
+            content: '';
+            width: 100%;
+            height: 2px;
+            background-color: var(--navbar-toggler-color);
+            position: absolute;
+            left: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-toggler-icon::before {
+            top: 6px;
+        }
+
+        .navbar-toggler-icon::after {
+            bottom: 6px;
+        }
+
+        /* Navbar Links */
+        .navbar-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin: 0 10px;
+            position: relative; /* Needed for dropdown positioning */
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--navbar-text);
+            font-size: 16px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: block; /* Ensure links behave like block elements */
+        }
+
+        .nav-link:hover {
+            background-color: var(--navbar-hover);
+            color: #ffffff;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: var(--navbar-bg);
+            box-shadow: var(--navbar-shadow);
+            border-radius: 4px;
+            padding: 10px 0;
+            z-index: 1000;
+            min-width: 160px; /* Adjust as needed */
+            top: 100%; /* Position below the parent link */
+            left: 0;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--navbar-text);
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--navbar-hover);
+            color: #ffffff;
+        }
+
+        /* Show dropdown on hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-toggler {
+                display: block; /* Show hamburger menu on mobile */
+            }
+
+            .navbar-links {
+                display: none; /* Hide links by default on mobile */
+                flex-direction: column;
+                width: 100%;
+                background-color: var(--navbar-bg);
+                position: absolute;
+                top: 60px;
+                left: 0;
+                box-shadow: var(--navbar-shadow);
+            }
+
+            .navbar-links.active {
+                display: flex; /* Show links when hamburger menu is clicked */
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+            }
+
+            .nav-item {
+                margin: 10px 0;
+            }
+
+            .dropdown-menu {
+                position: static; /* Dropdown content stacks vertically on mobile */
+                box-shadow: none;
+            }
+        }
+    </style>
+
+    <div class="navbar-container">
+        <!-- Logo or Brand Name -->
+        <a href="/" class="navbar-brand">Netfix</a>
+
+        <!-- Hamburger Menu for Mobile -->
+        <button class="navbar-toggler" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="navbar-links">
+            <ul class="navbar-nav">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="{% url 'services:service_list' %}" class="nav-link">View All Services</a></li>
+                <!-- All Categories Dropdown (Visible only on Home Page) -->
+                {% if request.path == '/' %}
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link">All Categories</a>
+                        <div class="dropdown-content">
+                            {% for field in fields %}
+                                <a href="?field={{ field }}" {% if field == selected_field %}class="active"{% endif %}>{{ field }}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <!-- User Actions -->
+            <ul class="navbar-nav">
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {% if request.user.is_company %}
+                                {{ request.user.username }} (Company)
+                            {% elif request.user.is_customer %}
+                                {{ request.user.username }} (Customer)
+                            {% endif %}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="userDropdown">
+                            {% if request.user.is_company %}
+                                <a href="{% url 'users:company_profile' username=request.user.username %}" class="dropdown-item">Profile</a>
+                            {% elif request.user.is_customer %}
+                                <a href="{% url 'users:customer_profile' username=request.user.username %}" class="dropdown-item">Profile</a>
+                            {% endif %}
+                            <a href="{% url 'main:logout' %}" class="dropdown-item">Logout</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'users:register' %}" class="nav-link">Register</a></li>
+                    <li><a href="{% url 'users:login_user' %}" class="nav-link">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggler = document.querySelector('.navbar-toggler');
+        const navbarLinks = document.querySelector('.navbar-links');
+
+        toggler.addEventListener('click', function () {
+            navbarLinks.classList.toggle('active');
+        });
+    });
+</script>

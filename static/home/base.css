@@ -10,7 +10,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #442727;
+  background-color: #c4c4ca;
   color: #333;
 }
 
@@ -62,8 +62,7 @@ body {
 
 /* Footer Styling */
 footer {
-  background-color: #5a11ed
-;
+  background-color: #5a11ed;
   color: white;
   text-align: center;
   padding: 10px 20px;

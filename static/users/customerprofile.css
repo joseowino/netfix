@@ -1,9 +1,9 @@
 :root {
-    --primary-color: #007bff;
+    --primary-color: #5a11ed;
     --secondary-color: #6c757d;
     --background-color: #f8f9fa;
     --text-color: #343a40;
-    --card-background: #ffffff;
+    --card-background: #f6f6f8;
     --card-border: 1px solid #dee2e6;
     --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -150,7 +150,7 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: #5a11ed;
 }
 
 .total-spent {

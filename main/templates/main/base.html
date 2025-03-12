@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      footer {
+  background-color: #22d557;
+  color: white;
+  text-align: center;
+  padding: 10px 20px;
+  margin-top: auto; /* Ensures footer sticks to the bottom */
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    </style>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Title{% endblock %}</title>
+    <!-- Base CSS -->
+    <!-- Block for additional CSS -->
+    {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'home/base.css' %}"/>
+  </head>
+  <body>
+    <!-- Navbar -->
+    {% include 'main/navbar.html' %}
+
+    <!-- Main Content -->
+    <div class="content">
+      {% block content %} replace me {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 NetFix - All Rights Reserved</p>
+    </footer>
+  </body>
+</html>

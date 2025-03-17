@@ -84,19 +84,19 @@
         display: block;
         padding: 10px;
         font-size: 14px;
-        color: var(--text-color);
+        color: var(--primary-color) !important;
         text-decoration: none;
         transition: background-color 0.3s ease;
     }
 
-    .dropdown-content a:hover {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
     .dropdown-content a.active {
         background-color: var(--primary-color);
-        color: white
+        color: var(--background-color) !important;
+    }
+
+    .dropdown-content a:hover {
+        background-color: var(--primary-color) !important;
+        color: var(--background-color) !important;
     }
 
     /* Show dropdown on hover */
@@ -194,23 +194,6 @@
 
 {% block content %}
 <div class="container">
-    <!-- Header -->
-    <!-- <header class="header"> -->
-        <!-- <div class="header-left"> -->
-            <!-- <h1 class="site_title">NetFix</h1> -->
-        <!-- </div> -->
-        <!-- <div class="header-right">
-            <!- Filter by Category Section -->
-            <!-- <div class="dropdown">
-                <button class="filter-dropdown">All Categories</button>
-                <div class="dropdown-content">
-                    {% for field in fields %}
-                        <a href="?field={{ field }}" {% if field == selected_field %}class="active"{% endif %}>{{ field }}</a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div> -->
-    <!-- </header> -->
 
     <!-- Most Requested Services Section -->
     <section class="services-section">

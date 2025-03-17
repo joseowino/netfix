@@ -45,7 +45,8 @@ body {
 }
 
 .navbar a:hover {
-  color: #ffdd57;
+  color: #5a11ed;;
+  background-color: white;
 }
 
 /* Content Area */

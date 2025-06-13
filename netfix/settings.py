@@ -27,11 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'users.backends.EmailBackend',  
-]
-
 AUTH_USER_MODEL = 'users.User'
 
 # Application definition
@@ -65,7 +60,7 @@ ROOT_URLCONF = 'netfix.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates',)],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,23 +118,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-import os
-from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Media configurations
-MEDIA_URL = '/media/'  # Public URL for serving media files
-MEDIA_ROOT = BASE_DIR/'media'  # Directory to store uploaded files

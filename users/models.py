@@ -7,6 +7,7 @@ class User(AbstractUser):
     is_company = models.BooleanField(default=False)
     is_customer = models.BooleanField(default=False)
     email = models.CharField(max_length=100, unique=True)
+    username = models.CharField(max_length=150, unique=True)
 
 
 class Customer(models.Model):

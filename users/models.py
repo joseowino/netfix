@@ -17,6 +17,9 @@ class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     birth = models.DateField()
 
+    def __str__(self):
+        return f"{self.user.username} (Customer)"
+
 
 class Company(models.Model):
     user = models.OneToOneField(

@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from . import views as v
+from main import views as v
 
 urlpatterns = [
     path('admin/', admin.site.urls),

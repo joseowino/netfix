@@ -52,3 +52,15 @@ class Service(models.Model):
         from django.urls import reverse
         return reverse('services:service_detail', args=[str(self.id)])
     
+    @property
+    def average_rating(self):
+        """Calculate average rating from service requests"""
+        requests = self.service_requests.filter(rating__isnull=False)
+        if requests.exists():
+            return requests.aggregate(models.Avg('rating'))['rating__avg']
+        return 0
+    
+    @property
+    def total_requests(self):
+        """Get total number of requests for this service"""
+        return self.service_requests.count()

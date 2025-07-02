@@ -47,3 +47,8 @@ class Service(models.Model):
     def __str__(self):
         return f"{self.name} - {self.company.username}"
     
+    def get_absolute_url(self):
+        """Return URL for service detail page"""
+        from django.urls import reverse
+        return reverse('services:service_detail', args=[str(self.id)])
+    

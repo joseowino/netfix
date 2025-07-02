@@ -31,6 +31,19 @@ class Service(models.Model):
         ('Water Heaters', 'Water Heaters'),
     )
     
+    field = models.CharField(max_length=30, blank=False, null=False, choices=FIELD_CHOICES)
+    
+    # Auto-set creation date (use auto_now_add for creation time)
+    date = models.DateTimeField(auto_now_add=True, null=False)
+    
+    # Track when service was last updated
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-date']  # Order by newest first
+        verbose_name = 'Service'
+        verbose_name_plural = 'Services'
+    
     def __str__(self):
         return f"{self.name} - {self.company.username}"
     

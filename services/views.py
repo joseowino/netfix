@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from users.models import Company, Customer, User
 
 from .models import Service
-from .forms import CreateNewService, RequestServiceForm
+from .forms import ServiceForm, ServiceRequestForm, ServiceSearchForm, ServiceRatingForm
 
 
 def service_list(request):
@@ -31,3 +31,17 @@ def service_field(request, field):
 
 def request_service(request, id):
     return render(request, 'services/request_service.html', {})
+
+
+# In your views.py
+from .forms import ServiceForm, ServiceRequestForm
+
+def create_service(request):
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, company=request.user.company)
+        if form.is_valid():
+            service = form.save(commit=False)
+            service.company = request.user.company
+            service.save()
+    else:
+        form = ServiceForm(company=request.user.company)

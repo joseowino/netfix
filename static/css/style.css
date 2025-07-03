@@ -171,6 +171,10 @@ button:hover {
   color: #f9f8fd;
 }
 
+.navbar ul li.right {
+  margin-left: auto;
+}
+
 .last_navbar {
   right: 0;
   position: absolute;

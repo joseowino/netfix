@@ -1,9 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, authenticate
+from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.core.exceptions import ValidationError
 
-from .models import User, Company, Customer
+from .models import User, Customer
 
 
 class DateInput(forms.DateInput):
@@ -101,13 +101,11 @@ class CompanySignUpForm(UserCreationForm):
 
 
 class UserLoginForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(UserLoginForm, self).__init__(*args, **kwargs)
-
+    """User login form using email and password."""
     email = forms.EmailField(widget=forms.TextInput(
-        attrs={'placeholder': 'Enter Email'}))
+        attrs={'placeholder': 'Enter Email', 'class': 'form-control'}))
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'placeholder': 'Enter Password'}))
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter Password', 'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         super(UserLoginForm, self).__init__(*args, **kwargs)

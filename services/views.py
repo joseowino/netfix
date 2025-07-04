@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from users.models import Company, Customer, User
 
 from .models import Service
-from .forms import ServiceForm, ServiceRequestForm, ServiceSearchForm, ServiceRatingForm
+from .forms import ServiceForm
 
 
 def service_list(request):

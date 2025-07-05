@@ -19,14 +19,11 @@
         </li>
         {% if request.user.is_authenticated %}
             <li><a href="{% url 'company_profile' request.user.username %}">Profile</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
+            <li><a href="{% url 'main:logout' %}">Logout</a></li>
         {% else %}
             <li class="right"><a href="{% url 'login_user' %}">Login</a></li>
             <li><a href="{% url 'register' %}">Register</a></li>
         {% endif %}
-
-        <li class="right"><a href="{% url 'login_user' %}">Login</a></li>
-        <li><a href="{% url 'register' %}">Register</a></li>
 
     </ul>
 

@@ -22,12 +22,15 @@
                             </div>
                         {% endif %}
                         
-                        <!-- Email field -->
+                        <!-- Email or Username field -->
                         <div class="mb-3">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="text-danger">{{ form.email.errors }}</div>
+                            <label for="{{ form.email_or_username.id_for_label }}" class="form-label">Email or Username</label>
+                            {{ form.email_or_username }}
+                            {% if form.email_or_username.help_text %}
+                                <div class="form-text">{{ form.email_or_username.help_text }}</div>
+                            {% endif %}
+                            {% if form.email_or_username.errors %}
+                                <div class="text-danger">{{ form.email_or_username.errors }}</div>
                             {% endif %}
                         </div>
                         

@@ -41,23 +41,28 @@ class CompanySignUpView(CreateView):
 
 
 def LoginUserView(request):
-    """Handle user login using email and password."""
+    """Handle user login using email/username and password with profile redirection."""
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
+            user_obj = form.cleaned_data['user_obj']
             password = form.cleaned_data['password']
-            # Try to find user by email since the form uses email
-            try:
-                user_obj = User.objects.get(email=email)
-                user = authenticate(request, username=user_obj.username, password=password)
-                if user is not None:
-                    login(request, user)
-                    return redirect('/')
+
+            # Authenticate the user
+            user = authenticate(request, username=user_obj.username, password=password)
+            if user is not None:
+                login(request, user)
+
+                # Redirect to appropriate profile page based on user type
+                if user.is_company:
+                    return redirect('company_profile', name=user.username)
+                elif user.is_customer:
+                    return redirect('customer_profile', name=user.username)
                 else:
-                    form.add_error(None, 'Invalid email or password')
-            except User.DoesNotExist:
-                form.add_error(None, 'Invalid email or password')
+                    # Fallback to home page for users without specific type
+                    return redirect('/')
+            else:
+                form.add_error(None, 'Invalid email/username or password.')
     else:
         form = UserLoginForm()
 

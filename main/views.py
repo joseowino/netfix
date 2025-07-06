@@ -38,12 +38,47 @@ def customer_profile(request, name):
 
 
 def company_profile(request, name):
-    # fetches the company user and all of the services available by it
-    user = User.objects.get(username=name)
-    services = Service.objects.filter(
-        company=Company.objects.get(user=user)).order_by("-date")
+    """Display company profile with their services and information."""
+    user = get_object_or_404(User, username=name)
 
-    return render(request, 'users/profile.html', {'user': user, 'services': services})
+    # Ensure the user is actually a company
+    if not user.is_company:
+        return render(request, 'main/error.html', {
+            'error_message': 'This user is not a company.'
+        })
+
+    try:
+        company = Company.objects.get(user=user)
+        # Get company's services ordered by creation date (newest first)
+        services = Service.objects.filter(company=company).order_by('-date')
+
+        # Calculate some statistics
+        total_services = services.count()
+        total_requests = sum(service.total_requests for service in services)
+        average_rating = 0
+        if services.exists():
+            ratings = [service.average_rating for service in services if service.average_rating > 0]
+            if ratings:
+                average_rating = sum(ratings) / len(ratings)
+
+    except Company.DoesNotExist:
+        company = None
+        services = []
+        total_services = 0
+        total_requests = 0
+        average_rating = 0
+
+    context = {
+        'user': user,
+        'company': company,
+        'services': services,
+        'total_services': total_services,
+        'total_requests': total_requests,
+        'average_rating': average_rating,
+        'is_company_profile': True
+    }
+
+    return render(request, 'users/company_profile.html', context)
 
 
 def logout(request):

@@ -1,0 +1,142 @@
+{% extends 'main/base.html' %}
+{% block title %}
+    {{ user.username }} - Customer Profile
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="text-center">Customer Profile</h4>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="card-text">
+                        <strong>Username:</strong> {{ user.username }}<br>
+                        <strong>Email:</strong> {{ user.email }}<br>
+                        {% if customer and customer.birth %}
+                            <strong>Date of Birth:</strong> {{ customer.birth|date:"F d, Y" }}<br>
+                        {% endif %}
+                        <strong>Member Since:</strong> {{ user.date_joined|date:"F Y" }}
+                    </p>
+                    
+                    {% if user == request.user %}
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-primary btn-sm">Edit Profile</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Requests -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Service Requests</h4>
+                    {% if user == request.user %}
+                        <a href="/services/" class="btn btn-success btn-sm">Browse Services</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if service_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Service</th>
+                                        <th>Company</th>
+                                        <th>Status</th>
+                                        <th>Date Requested</th>
+                                        <th>Total Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in service_requests %}
+                                    <tr>
+                                        <td>{{ request.service.name }}</td>
+                                        <td>{{ request.service.company.user.username }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if request.status == 'pending' %}bg-warning
+                                                {% elif request.status == 'accepted' %}bg-info
+                                                {% elif request.status == 'in_progress' %}bg-primary
+                                                {% elif request.status == 'completed' %}bg-success
+                                                {% elif request.status == 'cancelled' %}bg-danger
+                                                {% endif %}">
+                                                {{ request.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ request.request_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if request.total_cost %}
+                                                ${{ request.total_cost }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <h5 class="text-muted">No Service Requests Yet</h5>
+                            <p class="text-muted">You haven't requested any services yet.</p>
+                            {% if user == request.user %}
+                                <a href="/services/" class="btn btn-primary">Browse Available Services</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Account Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h4 class="text-primary">{{ service_requests|length }}</h4>
+                            <p class="text-muted">Total Requests</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-success">
+                                {{ service_requests|dictsort:"status"|dictsortreversed:"status"|slice:":1"|length }}
+                            </h4>
+                            <p class="text-muted">Completed</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-warning">
+                                {% with pending_count=0 %}
+                                    {% for req in service_requests %}
+                                        {% if req.status == 'pending' %}
+                                            {% with pending_count=pending_count|add:1 %}{% endwith %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ pending_count }}
+                                {% endwith %}
+                            </h4>
+                            <p class="text-muted">Pending</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-info">{{ user.date_joined|timesince }}</h4>
+                            <p class="text-muted">Member For</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

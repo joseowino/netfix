@@ -150,37 +150,91 @@
     <div class="row mt-4">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
-                    <h5>Account Statistics</h5>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Service Request Statistics
+                    </h5>
+                    <small class="text-muted">Overview of your service activity</small>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
-                        <div class="col-md-3">
-                            <h4 class="text-primary">{{ service_requests|length }}</h4>
-                            <p class="text-muted">Total Requests</p>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-list-alt fa-2x text-primary mb-2"></i>
+                                <h4 class="text-primary">{{ service_requests|length }}</h4>
+                                <p class="text-muted mb-0">Total Requests</p>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <h4 class="text-success">
-                                {{ service_requests|dictsort:"status"|dictsortreversed:"status"|slice:":1"|length }}
-                            </h4>
-                            <p class="text-muted">Completed</p>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <h4 class="text-success">
+                                    {% with completed_count=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.status == 'completed' %}
+                                                {% with completed_count=completed_count|add:1 %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ completed_count }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">Completed</p>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <h4 class="text-warning">
-                                {% with pending_count=0 %}
-                                    {% for req in service_requests %}
-                                        {% if req.status == 'pending' %}
-                                            {% with pending_count=pending_count|add:1 %}{% endwith %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    {{ pending_count }}
-                                {% endwith %}
-                            </h4>
-                            <p class="text-muted">Pending</p>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                <h4 class="text-warning">
+                                    {% with pending_count=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.status == 'pending' %}
+                                                {% with pending_count=pending_count|add:1 %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ pending_count }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">Pending</p>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <h4 class="text-info">{{ user.date_joined|timesince }}</h4>
-                            <p class="text-muted">Member For</p>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-cog fa-2x text-info mb-2"></i>
+                                <h4 class="text-info">
+                                    {% with progress_count=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.status == 'in_progress' %}
+                                                {% with progress_count=progress_count|add:1 %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ progress_count }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">In Progress</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+                                <h4 class="text-success">
+                                    {% with total_spent=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.total_cost %}
+                                                {% with total_spent=total_spent|add:req.total_cost %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        ${{ total_spent|floatformat:0 }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">Total Spent</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-user-clock fa-2x text-info mb-2"></i>
+                                <h4 class="text-info">{{ user.date_joined|timesince }}</h4>
+                                <p class="text-muted mb-0">Member For</p>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,13 +1,99 @@
-{% extends 'main/base.html' %} 
+{% extends 'main/base.html' %}
 {% block title %}
   Company Registration
-{%endblock %}
+{% endblock %}
 
 {% block content %}
-    <form method="POST">
-        {% csrf_token %}
-        {{form}}
-        <span class="helptext">Choose Field Above</span>
-        <button type="submit" name="register">Register</button>
-    </form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Company Registration</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <!-- Display form errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Username field -->
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Company Username</label>
+                            {{ form.username }}
+                            {% if form.username.help_text %}
+                                <div class="form-text">{{ form.username.help_text }}</div>
+                            {% endif %}
+                            {% if form.username.errors %}
+                                <div class="text-danger">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email field -->
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Company Email</label>
+                            {{ form.email }}
+                            {% if form.email.help_text %}
+                                <div class="form-text">{{ form.email.help_text }}</div>
+                            {% endif %}
+                            {% if form.email.errors %}
+                                <div class="text-danger">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Field of work field -->
+                        <div class="mb-3">
+                            <label for="{{ form.field_of_work.id_for_label }}" class="form-label">Field of Work</label>
+                            {{ form.field_of_work }}
+                            {% if form.field_of_work.help_text %}
+                                <div class="form-text">{{ form.field_of_work.help_text }}</div>
+                            {% endif %}
+                            {% if form.field_of_work.errors %}
+                                <div class="text-danger">{{ form.field_of_work.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password field -->
+                        <div class="mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.help_text %}
+                                <div class="form-text">{{ form.password1.help_text }}</div>
+                            {% endif %}
+                            {% if form.password1.errors %}
+                                <div class="text-danger">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password confirmation field -->
+                        <div class="mb-3">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.help_text %}
+                                <div class="form-text">{{ form.password2.help_text }}</div>
+                            {% endif %}
+                            {% if form.password2.errors %}
+                                <div class="text-danger">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" name="register" class="btn btn-primary">Register as Company</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p>Already have an account? <a href="{% url 'login_user' %}">Login here</a></p>
+                        <p>Want to register as a customer? <a href="{% url 'register_customer' %}">Register as Customer</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

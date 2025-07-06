@@ -190,12 +190,46 @@ class CompanySignUpForm(UserCreationForm):
 
 
 class UserLoginForm(forms.Form):
-    """User login form using email and password."""
-    email = forms.EmailField(widget=forms.TextInput(
-        attrs={'placeholder': 'Enter Email', 'class': 'form-control'}))
+    """User login form supporting both email and username authentication."""
+    email_or_username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter Email or Username',
+            'class': 'form-control'
+        }),
+        help_text='You can login with either your email address or username.'
+    )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'placeholder': 'Enter Password', 'class': 'form-control'}))
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Enter Password',
+            'class': 'form-control'
+        })
+    )
 
     def __init__(self, *args, **kwargs):
         super(UserLoginForm, self).__init__(*args, **kwargs)
-        self.fields['email'].widget.attrs['autocomplete'] = 'off'
+        self.fields['email_or_username'].widget.attrs['autocomplete'] = 'username'
+        self.fields['password'].widget.attrs['autocomplete'] = 'current-password'
+
+    def clean(self):
+        """Validate the login credentials."""
+        cleaned_data = super().clean()
+        email_or_username = cleaned_data.get('email_or_username')
+        password = cleaned_data.get('password')
+
+        if email_or_username and password:
+            # Try to find user by email first, then by username
+            user = None
+            try:
+                # Check if input looks like an email
+                if '@' in email_or_username:
+                    user = User.objects.get(email=email_or_username)
+                else:
+                    user = User.objects.get(username=email_or_username)
+            except User.DoesNotExist:
+                raise forms.ValidationError('Invalid email/username or password.')
+
+            # Store the found user for use in the view
+            cleaned_data['user_obj'] = user
+
+        return cleaned_data

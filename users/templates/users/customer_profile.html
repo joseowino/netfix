@@ -47,21 +47,47 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Service</th>
-                                        <th>Company</th>
-                                        <th>Status</th>
+                                        <th>Service Name</th>
+                                        <th>Field</th>
+                                        <th>Provider</th>
                                         <th>Date Requested</th>
-                                        <th>Total Cost</th>
+                                        <th>Cost</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for request in service_requests %}
                                     <tr>
-                                        <td>{{ request.service.name }}</td>
-                                        <td>{{ request.service.company.user.username }}</td>
                                         <td>
-                                            <span class="badge 
-                                                {% if request.status == 'pending' %}bg-warning
+                                            <strong>{{ request.service.name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.service.description|truncatewords:8 }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ request.service.field }}</span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ request.service.company.user.username }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.service.company.user.email }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ request.request_date|date:"M d, Y" }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.request_date|date:"g:i A" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if request.total_cost %}
+                                                <strong class="text-success">${{ request.total_cost }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ request.service_time }}h × ${{ request.service.price_hour }}/h</small>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge
+                                                {% if request.status == 'pending' %}bg-warning text-dark
                                                 {% elif request.status == 'accepted' %}bg-info
                                                 {% elif request.status == 'in_progress' %}bg-primary
                                                 {% elif request.status == 'completed' %}bg-success
@@ -69,14 +95,6 @@
                                                 {% endif %}">
                                                 {{ request.get_status_display }}
                                             </span>
-                                        </td>
-                                        <td>{{ request.request_date|date:"M d, Y" }}</td>
-                                        <td>
-                                            {% if request.total_cost %}
-                                                ${{ request.total_cost }}
-                                            {% else %}
-                                                -
-                                            {% endif %}
                                         </td>
                                     </tr>
                                     {% endfor %}

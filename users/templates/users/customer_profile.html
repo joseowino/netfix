@@ -1,0 +1,245 @@
+{% extends 'main/base.html' %}
+{% block title %}
+    {{ user.username }} - Customer Profile
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="text-center">Customer Profile</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
+                    </div>
+                    <h5 class="card-title mb-3">{{ user.get_full_name|default:user.username }}</h5>
+
+                    <div class="row text-start">
+                        <div class="col-12 mb-2">
+                            <i class="fas fa-user text-primary me-2"></i>
+                            <strong>Username:</strong>
+                            <span class="text-muted">{{ user.username }}</span>
+                        </div>
+                        <div class="col-12 mb-2">
+                            <i class="fas fa-envelope text-primary me-2"></i>
+                            <strong>Email:</strong>
+                            <span class="text-muted">{{ user.email }}</span>
+                        </div>
+                        {% if customer and customer.birth %}
+                        <div class="col-12 mb-2">
+                            <i class="fas fa-birthday-cake text-primary me-2"></i>
+                            <strong>Date of Birth:</strong>
+                            <span class="text-muted">{{ customer.birth|date:"F d, Y" }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="col-12 mb-2">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <strong>Member Since:</strong>
+                            <span class="text-muted">{{ user.date_joined|date:"F Y" }}</span>
+                        </div>
+                        <div class="col-12">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            <strong>Last Login:</strong>
+                            <span class="text-muted">
+                                {% if user.last_login %}
+                                    {{ user.last_login|date:"M d, Y g:i A" }}
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    {% if user == request.user %}
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-primary btn-sm">Edit Profile</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Requests -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Service Requests</h4>
+                    {% if user == request.user %}
+                        <a href="/services/" class="btn btn-success btn-sm">Browse Services</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if service_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Service Name</th>
+                                        <th>Field</th>
+                                        <th>Provider</th>
+                                        <th>Date Requested</th>
+                                        <th>Cost</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in service_requests %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ request.service.name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.service.description|truncatewords:8 }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ request.service.field }}</span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ request.service.company.user.username }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.service.company.user.email }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ request.request_date|date:"M d, Y" }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.request_date|date:"g:i A" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if request.total_cost %}
+                                                <strong class="text-success">${{ request.total_cost }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ request.service_time }}h × ${{ request.service.price_hour }}/h</small>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge
+                                                {% if request.status == 'pending' %}bg-warning text-dark
+                                                {% elif request.status == 'accepted' %}bg-info
+                                                {% elif request.status == 'in_progress' %}bg-primary
+                                                {% elif request.status == 'completed' %}bg-success
+                                                {% elif request.status == 'cancelled' %}bg-danger
+                                                {% endif %}">
+                                                {{ request.get_status_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <h5 class="text-muted">No Service Requests Yet</h5>
+                            <p class="text-muted">You haven't requested any services yet.</p>
+                            {% if user == request.user %}
+                                <a href="/services/" class="btn btn-primary">Browse Available Services</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Service Request Statistics
+                    </h5>
+                    <small class="text-muted">Overview of your service activity</small>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-list-alt fa-2x text-primary mb-2"></i>
+                                <h4 class="text-primary">{{ service_requests|length }}</h4>
+                                <p class="text-muted mb-0">Total Requests</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <h4 class="text-success">
+                                    {% with completed_count=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.status == 'completed' %}
+                                                {% with completed_count=completed_count|add:1 %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ completed_count }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">Completed</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                <h4 class="text-warning">
+                                    {% with pending_count=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.status == 'pending' %}
+                                                {% with pending_count=pending_count|add:1 %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ pending_count }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">Pending</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-cog fa-2x text-info mb-2"></i>
+                                <h4 class="text-info">
+                                    {% with progress_count=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.status == 'in_progress' %}
+                                                {% with progress_count=progress_count|add:1 %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ progress_count }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">In Progress</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+                                <h4 class="text-success">
+                                    {% with total_spent=0 %}
+                                        {% for req in service_requests %}
+                                            {% if req.total_cost %}
+                                                {% with total_spent=total_spent|add:req.total_cost %}{% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        ${{ total_spent|floatformat:0 }}
+                                    {% endwith %}
+                                </h4>
+                                <p class="text-muted mb-0">Total Spent</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-item">
+                                <i class="fas fa-user-clock fa-2x text-info mb-2"></i>
+                                <h4 class="text-info">{{ user.date_joined|timesince }}</h4>
+                                <p class="text-muted mb-0">Member For</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

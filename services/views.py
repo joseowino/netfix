@@ -7,6 +7,7 @@ from .models import Service
 from .forms import ServiceForm
 
 
+
 def service_list(request):
     services = Service.objects.all().order_by("-date")
     return render(request, 'services/list.html', {'services': services})
@@ -18,8 +19,9 @@ def index(request, id):
 
 
 def create(request):
-    return render(request, 'services/create.html', {})
-
+    return render(request, 'services/create.html',
+            {'form': ServiceForm(company=request.user.company)})
+    
 
 def service_field(request, field):
     # search for the service present in the url
@@ -32,10 +34,6 @@ def service_field(request, field):
 def request_service(request, id):
     return render(request, 'services/request_service.html', {})
 
-
-# In your views.py
-from .forms import ServiceForm, ServiceRequestForm
-
 def create_service(request):
     if request.method == 'POST':
         form = ServiceForm(request.POST, company=request.user.company)
@@ -45,3 +43,5 @@ def create_service(request):
             service.save()
     else:
         form = ServiceForm(company=request.user.company)
+
+    return render(request, 'services/create.html', {'form': form})

@@ -1,18 +1,196 @@
 {% extends 'main/base.html' %}
-{% block title %}
-    Services List
-{% endblock %}
+{% load static %}
+
+{% block title %}All Services - NetFix{% endblock %}
+
 {% block content %}
-    <p class="title">Services</p>
-    {% if user.is_company %}
-        <a class="create_service" href="/services/create"> Create Service</a>
-    {% endif %}
-    <div class='services_list'>
-        {% if services %}
-            {% for service in services.all %}
-            {% endfor %}
-        {% else %}
-            <h2>Sorry No services available yet</h2>
-        {% endif %}
-     </div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">All Services</h1>
+            
+            <!-- Search and Filter Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Search & Filter Services</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            {{ search_form.query }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ search_form.field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ search_form.min_price }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ search_form.max_price }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ search_form.sort_by }}
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Services Count -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="text-muted">{{ total_services }} service{{ total_services|pluralize }} found</h5>
+                <a href="{% url 'services:most_requested' %}" class="btn btn-outline-secondary">
+                    View Most Requested
+                </a>
+            </div>
+            
+            <!-- Services Grid -->
+            {% if services %}
+                <div class="row">
+                    {% for service in services %}
+                        <div class="col-md-4 col-lg-3 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="{% url 'services:service_detail' service.id %}" 
+                                           class="text-decoration-none">
+                                            {{ service.name }}
+                                        </a>
+                                    </h5>
+                                    
+                                    <p class="card-text text-muted small">
+                                        {{ service.description|truncatewords:15 }}
+                                    </p>
+                                    
+                                    <div class="mb-2">
+                                        <span class="badge bg-secondary">{{ service.field }}</span>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong class="text-success">${{ service.price_hour }}/hour</strong>
+                                        </div>
+                                        <div>
+                                            {% if service.rating > 0 %}
+                                                <span class="text-warning">
+                                                    {% for i in "12345" %}
+                                                        {% if forloop.counter <= service.rating %}
+                                                            ★
+                                                        {% else %}
+                                                            ☆
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">No ratings</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            by <a href="{% url 'users:company_profile' service.company.id %}" 
+                                                  class="text-decoration-none">
+                                                {{ service.company.username }}
+                                            </a>
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            Created: {{ service.date|date:"M d, Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'services:service_detail' service.id %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            View Details
+                                        </a>
+                                        {% if user.is_authenticated and user.customer %}
+                                            <a href="{% url 'services:request_service' service.id %}" 
+                                               class="btn btn-primary btn-sm">
+                                                Request Service
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if services.has_other_pages %}
+                    <nav aria-label="Services pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if services.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.field %}&field={{ request.GET.field }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}">
+                                        First
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ services.previous_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.field %}&field={{ request.GET.field }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}">
+                                        Previous
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ services.number }} of {{ services.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if services.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ services.next_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.field %}&field={{ request.GET.field }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}">
+                                        Next
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ services.paginator.num_pages }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.field %}&field={{ request.GET.field }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}">
+                                        Last
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-3x text-muted"></i>
+                    </div>
+                    <h3 class="text-muted">No services found</h3>
+                    <p class="text-muted">Try adjusting your search criteria or browse all categories.</p>
+                    <a href="{% url 'services:service_list' %}" class="btn btn-primary">
+                        View All Services
+                    </a>
+                </div>
+            {% endif %}
+            
+            <!-- Service Categories -->
+            <div class="mt-5">
+                <h4 class="mb-3">Browse by Category</h4>
+                <div class="row">
+                    {% for field_choice in service_categories %}
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <a href="{% url 'services:services_by_category' field_choice.0 %}" 
+                               class="btn btn-outline-secondary w-100">
+                                {{ field_choice.1 }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

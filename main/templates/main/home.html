@@ -8,4 +8,16 @@
         <p class="site_title">NetFix</p>
         <img class="home_logo" src="static/css/logo.png" alt="logo">
     </div>
+    <div class="services-container">
+        <h2>Most Requested Services</h2>
+        <ul class="services-list">
+            {% for service in services %}
+                <li>
+                    <a href="{% url 'service_detail' service.id %}">{{ service.name }}</a>
+                    <span class="service-field">({{ service.field }})</span>
+                    <span class="service-price">€{{ service.price_hour }}/hour</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

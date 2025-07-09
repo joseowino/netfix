@@ -1,0 +1,49 @@
+{% extends 'main/base.html' %}
+{% block title %}
+    Service Request Details
+{% endblock %}
+
+{% block content %}
+    <div class="service-request-detail">
+        <h2>Service Request Details</h2>
+        <div class="request-info">
+            <p><strong>Service:</strong> {{ request.service.name }}</p>
+            <p><strong>Status:</strong> {{ request.status }}</p>
+            <p><strong>Requested Date:</strong> {{ request.requested_date|date:"F j, Y" }}</p>
+            <p><strong>Hours Needed:</strong> {{ request.hours_needed }}</p>
+            <p><strong>Address:</strong> {{ request.address }}</p>
+            {% if request.notes %}
+                <p><strong>Notes:</strong> {{ request.notes }}</p>
+            {% endif %}
+        </div>
+
+        {% if request.status == 'COMPLETED' and user.is_customer %}
+            {% if can_review %}
+                <div class="review-section">
+                    <h3>Leave a Review</h3>
+                    <p>Share your experience with this service!</p>
+                    <a href="{% url 'create_review' request.id %}" class="btn btn-primary">Write Review</a>
+                </div>
+            {% endif %}
+            
+            {% if review %}
+                <div class="review-section">
+                    <h3>Your Review</h3>
+                    <div class="review-content">
+                        <div class="stars">
+                            {% for i in "54321" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <span class="star filled">★</span>
+                                {% else %}
+                                    <span class="star">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="review-date">Posted on {{ review.created_at|date:"F j, Y" }}</p>
+                        <p class="review-text">{{ review.comment }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

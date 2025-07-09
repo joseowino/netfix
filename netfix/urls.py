@@ -16,16 +16,20 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls.static import static
 
-from main import views as v
-from users import views as user_views
+from . import settings
+from users.views import ProfileView
+
+admin.site.site_header = 'My Site Administration'
+admin.site.site_title = 'My Site Admin'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # App URLS
     path('', include('main.urls')),
+    path('', include('users.urls')),
     path('services/', include('services.urls')),
-    path('users', include('users.urls')),
-    path('login/', user_views.LoginUserView, name='login_user'),
-    path('customer/<slug:name>', v.customer_profile, name='customer_profile'),
-    path('company/<slug:name>', v.company_profile, name='company_profile')
-]
+    path('profile/<str:username>/', ProfileView, name='profile'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

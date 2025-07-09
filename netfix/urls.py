@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
     path('services/', include('services.urls')),
-    path('register/', include('users.urls')),
+    path('users', include('users.urls')),
     path('login/', user_views.LoginUserView, name='login_user'),
     path('customer/<slug:name>', v.customer_profile, name='customer_profile'),
     path('company/<slug:name>', v.company_profile, name='company_profile')

@@ -1,30 +1,16 @@
 from django.urls import path
-from . import views 
+from . import views as v
 
-app_name = 'services'
-
-urlpatterns = [
-    path('create/', views.create, name='services_create'),
-    path('<int:id>', views.index, name='index'),
-    path('<int:id>/request_service/', views.request_service, name='request_service'),
-    path('<slug:field>/', views.service_field, name='services_field'),
-
-    path('', views.service_list, name='service_list'),
-    path('most-requested/', views.most_requested_services, name='most_requested'),
-    path('category/<str:category>/', views.services_by_category, name='services_by_category'),
-    
-    # Individual service
-    path('service/<int:service_id>/', views.service_detail, name='service_detail'),
-    path('service/<int:service_id>/request/', views.request_service, name='request_service'),
-    
-    # Service management (for companies)
-    path('create/', views.create_service, name='create_service'),
-    # path('service/<int:service_id>/edit/', views.edit_service, name='edit_service'),
-    # path('service/<int:service_id>/delete/', views.delete_service, name='delete_service'),
-    
-    # Service requests management
-    path('requests/', views.ServiceRequest, name='service_requests'),
-    path('request/<int:request_id>/', views.request_service, name='request_detail'),
-    # path('request/<int:request_id>/rate/', views.rate_service, name='rate_service'),
+urlpatterns = [  
+    path('', v.service_list, name='services_list'),
+    path('<int:id>/', v.index, name='service_detail'),
+    path('create/', v.create, name='create_service'),
+    path('<str:field>/', v.service_field, name='service_field'),
+    path('<int:id>/request_service/', v.request_service, name='request_service'),
+    # Service request management
+    path('requests/', v.service_requests_list, name='service_requests_list'),
+    path('requests/<int:request_id>/', v.service_request_detail, name='service_request_detail'),
+    path('requests/<int:request_id>/update/', v.update_service_request, name='update_service_request'),
+    path('requests/<int:request_id>/cancel/', v.cancel_service_request, name='cancel_service_request'),
+    path('request/<int:request_id>/review/', v.create_review, name='create_review'),
 ]
-

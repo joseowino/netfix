@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
 from users.models import Company, Customer, User
-from users.utils import calculate_age  
+from utils import calculate_age  
 
 from .models import Service, ServiceRequest, Review
 from .forms import CreateNewService, RequestServiceForm, ReviewForm

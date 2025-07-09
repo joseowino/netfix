@@ -171,7 +171,7 @@ def create_review(request, request_id):
     else:
         form = ReviewForm()
     
-    return render(request, 'services/review.html', {
+    return render(request, 'services/create_review.html', {
         'form': form,
         'service_request': service_request
     })

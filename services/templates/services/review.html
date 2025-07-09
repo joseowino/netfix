@@ -1,0 +1,38 @@
+{% extends 'main/base.html' %}
+{% block title %}Review Service{% endblock %}
+
+{% block content %}
+<div class="review-container">
+    <h2>Review {{ service_request.service.name }}</h2>
+    <div class="service-info">
+        <p>Provider: {{ service_request.service.company.user.username }}</p>
+        <p>Completed on: {{ service_request.created_at|date:"F j, Y" }}</p>
+    </div>
+    
+    <form method="post" class="review-form">
+        {% csrf_token %}
+        <div class="rating-input">
+            <label for="{{ form.rating.id_for_label }}">Rating:</label>
+            <div class="star-rating">
+                <input type="radio" name="rating" value="5" id="star5" {% if form.rating.value == 5 %}checked{% endif %}>
+                <label for="star5">★</label>
+                <input type="radio" name="rating" value="4" id="star4" {% if form.rating.value == 4 %}checked{% endif %}>
+                <label for="star4">★</label>
+                <input type="radio" name="rating" value="3" id="star3" {% if form.rating.value == 3 %}checked{% endif %}>
+                <label for="star3">★</label>
+                <input type="radio" name="rating" value="2" id="star2" {% if form.rating.value == 2 %}checked{% endif %}>
+                <label for="star2">★</label>
+                <input type="radio" name="rating" value="1" id="star1" {% if form.rating.value == 1 %}checked{% endif %}>
+                <label for="star1">★</label>
+            </div>
+        </div>
+        
+        <div class="comment-input">
+            <label for="{{ form.comment.id_for_label }}">Your Review:</label>
+            {{ form.comment }}
+        </div>
+        
+        <button type="submit" class="submit-review">Submit Review</button>
+    </form>
+</div>
+{% endblock %}

@@ -4,8 +4,43 @@
     {% endblock %}
 
 {% block content %}
-    <div style="margin-top: 50px;">
-        <p class="site_title">NetFix</p>
-        <img class="home_logo" src="static/css/logo.png" alt="logo">
+    <div class="home-container">
+        <div class="hero-section">
+            <p class="site_title">NetFix</p>
+            <img class="home_logo" src="static/css/logo.png" alt="logo">
+            <p class="tagline">Your one-stop solution for home services</p>
+        </div>
+
+        <div class="popular-services-section">
+            <h2>Most Popular Services</h2>
+            {% if popular_services %}
+                <div class="services-grid">
+                    {% for service in popular_services %}
+                        <div class="service-card">
+                            <div class="service-header">
+                                <h3><a href="{% url 'service_detail' service.id %}">{{ service.name }}</a></h3>
+                                <span class="price">€{{ service.price_hour }}/hour</span>
+                            </div>
+                            <div class="service-info">
+                                <p class="field">{{ service.field }}</p>
+                                <p class="company">by <a href="{% url 'profile' service.company.user.username %}">{{ service.company.user.username }}</a></p>
+                                <p class="description">{{ service.description|truncatewords:20 }}</p>
+                            </div>
+                            <div class="service-footer">
+                                <span class="requests">{{ service.get_request_count }} requests</span>
+                                {% if user.is_customer %}
+                                    <a href="{% url 'request_service' service.id %}" class="request-btn">Request Service</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="view-all">
+                    <a href="{% url 'services_list' %}" class="view-all-btn">View All Services</a>
+                </div>
+            {% else %}
+                <p class="no-services">No services available yet.</p>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

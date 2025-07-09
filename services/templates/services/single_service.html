@@ -5,10 +5,30 @@
 {% block content %}
     <div class='service_info_header'>
         <h1>{{service.name}} -- {{service.price_hour}}€/hour</h1>
-        <h5>by <a href="/company/{{service.company.user}}">{{service.company.user}}</a></h5>
+        <h3>
+            <div class="service-stats">
+                <div class="stars">
+                    {% for i in "54321" %}
+                        {% if forloop.counter <= service.rating %}
+                            <span class="star filled">★</span>
+                        {% else %}
+                            <span class="star">☆</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="request-count">({{ service.get_request_count }} requests)</span>
+            </div>
+            by <a href="{% url 'profile' service.company.user.username %}">{{service.company.user}}</a>
+        </h3>
     </div>
-    <h3>{{service.field}}</h3>
-    <p style="text-align: left;">{{service.description}}</p>
+    <div class="service_details">
+        <h3>Field: {{service.field}}</h3>
+        <p class="creation_date">Created on: {{ service.date|date:"F j, Y, g:i a" }}</p>
+        <div class="description">
+            <h4>Description:</h4>
+            <p>{{service.description}}</p>
+        </div>
+    </div>
     {% if request.user.is_customer %}
         <a href="/services/{{service.id}}/request_service/" class="like_button">Request Service</a>
     {% endif %}

@@ -6,40 +6,124 @@
 {% block content %}
     {% if user.is_customer %}
         <div style="display: ruby;">
-            <h1>{{ user.username }} ({{user_age}} y/o)</h1>
+            <h1>{{ user.username }} ({{user_age}} years old)</h1>
             <p>{{ user.email }}</p>
             <p style="float: right;">Customer</p>
         </div>
+        
+        <p class="title">Previous Requested Services</p>
+        {% if sh %}
+            {% for service in sh %}
+                <div class="service-request-item">
+                    <div class="request-header">
+                        <a href="{% url 'service_detail' service.service.id %}">{{service.service.name}}</a>
+                        <span class="status status-{{service.status|lower}}">Status: {{service.status}}</span>
+                    </div>
+                    <div class="request-details">
+                        <p><strong>Field:</strong> {{service.service.field}}</p>
+                        <p><strong>Total Cost:</strong> €{{service.total_cost}}</p>
+                        <p><strong>Requested Date:</strong> {{ service.requested_date|date:"F j, Y" }}</p>
+                        <p><strong>Provider:</strong> 
+                            <a href="{% url 'profile' service.service.company.user.username %}">
+                                {{service.service.company.user.username}}
+                            </a>
+                        </p>
+                        {% if service.status == 'COMPLETED' %}
+                            {% if service.review %}
+                                <p class="review-status">
+                                    <div class="stars">
+                                        {% for i in "54321" %}
+                                            {% if forloop.counter <= service.review.rating %}
+                                                <span class="star filled">★</span>
+                                            {% else %}
+                                                <span class="star">☆</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <span class="review-text">Reviewed</span>
+                                </p>
+                            {% else %}
+                                <p class="review-status pending">
+                                    Review Pending  
+                                    <a href="{% url 'service_request_detail' service.id %}">Leave a Review</a>
+                                </p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="line"></div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No service requests yet.</p>
+        {% endif %}
     {% else %}
         <div style="display: ruby;">
             <h1>{{ user.username }}</h1>
-            <p> {{ user.email }}</p>
+            <p>{{ user.email }}</p>
             <p style="float: right;">{{user.company.field}} Company</p>
         </div>
-       {% endif %}
-    {% if 'customer' in request.path %}
-        <p class="title">Previous Requested Services</p>
-    {% else %}
-        <p class="title">Available Services</p>
-    {% endif %}
-    {% if user.is_customer %}
-        {% for service in sh %}
-            <div>
-                <a href="/services/{{service.service.id}}">{{service.service.name}}</a> ({{service.service.field}})
-                <p style="margin: 0; display: inline-block;"> ❱❱ {{service.price}}</p>
-                <p style="margin: 0; display: inline-block;"> ❱❱ {{ service.request_date }}</p>
-                <p style="float: right; margin: 0;">
-                    by <a href="/company/{{service.service.company.user}}">{{service.service.company.user}}</a>
-                </p> 
+
+        {% if user.company.image %}
+            <div class="company-image">
+                <img src="{{ user.company.image.url }}" alt="{{ user.username }}'s company image">
             </div>
-            <div class="line"></div>
-        {% endfor %}
-    {% else %}
-        {% for service in services %}
-        <div class="list_services_profile">
-            <a href="/services/{{service.id}}">{{service.name}}</a>-- {{service.price_hour}}€/hour
-            <div class="line"></div>
+        {% endif %}
+        
+        <div class="company-description">
+            {% if user.company.description %}
+                <p class="title">About Us</p>
+                <p>{{ user.company.description }}</p>
+            {% endif %}
         </div>
+        
+        <p class="title">Available Services</p>
+        {% for service in services %}
+            <div class="list_services_profile">
+                <a href="{% url 'service_detail' service.id %}">{{service.name}}</a>-- {{service.price_hour}}€/hour
+                <div class="line"></div>
+            </div>
+        {% empty %}
+            <p>No services available.</p>
         {% endfor %}
+
+        <!-- Service Requests section - only visible to the company owner -->
+        {% if user.is_company %}       
+            {% if request.user == user %}
+                <p class="title">Service Requests</p>
+                {% if service_requests %}
+                    {% for request in service_requests %}
+                        <div class="service-request-item">
+                            <div class="request-header">
+                                <a href="{% url 'service_detail' request.service.id %}">{{request.service.name}}</a>
+                                <span class="status status-{{request.status|lower}}">Status: {{request.status}}</span>
+                            </div>
+                            <div class="request-details">
+                                <p>Customer: {{request.customer.user.username}}</p>
+                                <p>Requested Date: {{ request.requested_date|date:"F j, Y" }}</p>
+                                {% if request.status == 'PENDING' %}
+                                    <form method="POST" action="{% url 'update_service_request' request.id %}" class="inline-form">
+                                        {% csrf_token %}
+                                        <select name="status">
+                                            <option value="ACCEPTED">Accept</option>
+                                            <option value="CANCELLED">Cancel</option>
+                                        </select>
+                                        <button type="submit">Update Status</button>
+                                    </form>
+                                {% elif request.status == 'ACCEPTED' %}
+                                    <form method="POST" action="{% url 'update_service_request' request.id %}" class="inline-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="status" value="COMPLETED">
+                                        <button type="submit">Mark as Completed</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                            <div class="line"></div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No service requests yet.</p>
+                {% endif %}
+            {% endif %}
+        {% endif %}
     {% endif %}
 {% endblock %}

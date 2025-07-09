@@ -1,17 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django.db.models import Q
-
-from users.models import Company, Customer, User
 from django.contrib.auth.decorators import login_required
 
-from .models import Service, ServiceRequest
-from .forms import ServiceForm, ServiceRequestForm, ServiceSearchForm
+from users.models import Company, Customer, User
+from utils import calculate_age  
+
+from .models import Service, ServiceRequest, Review
+from .forms import CreateNewService, RequestServiceForm, ReviewForm
+
 
 def service_list(request):
     services = Service.objects.all().order_by("-date")
+    print(f"Number of services found: {services.count()}")  # DEBUG line
     return render(request, 'services/list.html', {'services': services})
 
 
@@ -21,185 +21,157 @@ def index(request, id):
 
 
 def create(request):
-    return render(request, 'services/create.html',
-            {'form': ServiceForm(company=request.user.company)})
-    
+    if not request.user.is_company:
+        return redirect('services_list')
+        
+    if request.method == 'POST':
+        form = CreateNewService(request.POST, company=request.user.company)
+        if form.is_valid():
+            field = form.cleaned_data['field']
+            company = request.user.company
+            
+            service = Service(
+                company=company,
+                name=form.cleaned_data['name'],
+                description=form.cleaned_data['description'],
+                price_hour=form.cleaned_data['price_hour'],
+                field=field
+            )
+            service.save()
+            return redirect('services_list')
+    else:
+        form = CreateNewService(company=request.user.company)
+    return render(request, 'services/create.html', {'form': form})
+
 
 def service_field(request, field):
-    # search for the service present in the url
+    # Convert URL-friendly format to the actual field name
     field = field.replace('-', ' ').title()
-    services = Service.objects.filter(
-        field=field)
+    services = Service.objects.filter(field=field)
+    
     return render(request, 'services/field.html', {'services': services, 'field': field})
 
 
 def request_service(request, id):
-    return render(request, 'services/request_service.html', {})
-
-def create_service(request):
+    if not request.user.is_customer:
+        return redirect('services_list')
+        
+    service = Service.objects.get(id=id)
     if request.method == 'POST':
-        form = ServiceForm(request.POST, company=request.user.company)
+        form = RequestServiceForm(request.POST)
         if form.is_valid():
-            service = form.save(commit=False)
-            service.company = request.user.company
-            service.save()
-    else:
-        form = ServiceForm(company=request.user.company)
-
-    return render(request, 'services/create.html', {'form': form})
-
-
-def service_list(request):
-    """
-    Display all services ordered by newest first with search and filter functionality
-    """
-    # Get all services ordered by newest first
-    services = Service.objects.all().order_by('-date')
-    
-    # Handle search and filtering
-    search_form = ServiceSearchForm(request.GET)
-    
-    if search_form.is_valid():
-        query = search_form.cleaned_data.get('query')
-        field = search_form.cleaned_data.get('field')
-        min_price = search_form.cleaned_data.get('min_price')
-        max_price = search_form.cleaned_data.get('max_price')
-        sort_by = search_form.cleaned_data.get('sort_by')
-        
-        # Apply filters
-        if query:
-            services = services.filter(
-                Q(name__icontains=query) | 
-                Q(description__icontains=query) |
-                Q(company__username__icontains=query)
+            service_request = ServiceRequest(
+                service=service,
+                customer=request.user.customer,
+                requested_date=form.cleaned_data['requested_date'],
+                address=form.cleaned_data['address'],
+                hours_needed=form.cleaned_data['hours_needed'],
+                notes=form.cleaned_data['notes']
             )
-        
-        if field:
-            services = services.filter(field=field)
-        
-        if min_price:
-            services = services.filter(price_hour__gte=min_price)
-        
-        if max_price:
-            services = services.filter(price_hour__lte=max_price)
-        
-        # Apply sorting
-        if sort_by:
-            services = services.order_by(sort_by)
-    
-    # Pagination - 12 services per page
-    paginator = Paginator(services, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'services': page_obj,
-        'search_form': search_form,
-        'total_services': services.count(),
-    }
-    
-    return render(request, 'services/list.html', context)
-
-
-def service_detail(request, service_id):
-    """
-    Display individual service details
-    """
-    service = get_object_or_404(Service, id=service_id)
-    
-    # Check if current user can request this service
-    can_request = False
-    if request.user.is_authenticated:
-        # Only customers can request services, not companies
-        if hasattr(request.user, 'customer'):
-            can_request = True
-    
-    context = {
-        'service': service,
-        'can_request': can_request,
-    }
-    
-    return render(request, 'services/service_detail.html', context)
-
+            service_request.save()
+            # Redirect to the user's profile instead of the requests list
+            return redirect('profile', username=request.user.username)
+    else:
+        form = RequestServiceForm()
+    return render(request, 'services/request_service.html', {'form': form, 'service': service})
 
 @login_required
-def request_service(request, service_id):
-    """
-    Allow customers to request a service
-    """
-    service = get_object_or_404(Service, id=service_id)
+def service_requests_list(request):
+    if request.user.is_customer:
+        # For customers, show their own requests
+        requests = ServiceRequest.objects.filter(
+            customer=request.user.customer
+        ).select_related('service', 'service__company', 'customer', 'customer__user'
+        ).order_by('-created_at')  # Added ordering here
+    else:
+        # For companies, show requests for their services
+        requests = ServiceRequest.objects.filter(
+            service__company=request.user.company
+        ).select_related('service', 'service__company', 'customer', 'customer__user'
+        ).order_by('-created_at')  # Added ordering here
     
-    # Check if user is a customer
-    if not hasattr(request.user, 'customer'):
-        messages.error(request, "Only customers can request services.")
-        return redirect('services:service_detail', service_id=service_id)
+    return render(request, 'services/requests_list.html', {'requests': requests})
+
+@login_required
+def service_request_detail(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+    # Check if user has permission to view this request
+    if not (request.user.is_customer and service_request.customer == request.user.customer) and \
+       not (request.user.is_company and service_request.service.company == request.user.company):
+        return redirect('services_list')
+    
+    # Get review if it exists
+    try:
+        review = Review.objects.get(service_request=service_request)
+    except Review.DoesNotExist:
+        review = None
+    
+    # Check if user can review
+    can_review = (
+        request.user.is_customer and 
+        service_request.customer == request.user.customer and 
+        service_request.status == 'COMPLETED' and 
+        review is None
+    )
+    
+    context = {
+        'request': service_request,
+        'review': review,
+        'can_review': can_review
+    }
+    
+    return render(request, 'services/request_detail.html', context)
+
+@login_required
+def update_service_request(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+    # Only company can update status
+    if not request.user.is_company or service_request.service.company != request.user.company:
+        return redirect('services_list')
     
     if request.method == 'POST':
-        form = ServiceRequestForm(request.POST)
-        if form.is_valid():
-            service_request = form.save(commit=False)
-            service_request.customer = request.user.customer
-            service_request.service = service
+        new_status = request.POST.get('status')
+        if new_status in dict(ServiceRequest._meta.get_field('status').choices):
+            service_request.status = new_status
             service_request.save()
-            
-            messages.success(request, f"Service '{service.name}' requested successfully!")
-            return redirect('users:profile')
+    return redirect('service_request_detail', request_id=request_id)
+
+@login_required
+def cancel_service_request(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+    # Only customer who created the request can cancel it
+    if not request.user.is_customer or service_request.customer != request.user.customer:
+        return redirect('services_list')
+    
+    if request.method == 'POST':
+        service_request.status = 'CANCELLED'
+        service_request.save()
+    return redirect('service_requests_list')
+
+@login_required
+def create_review(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+    
+    # Verify that the customer can review this service
+    if not (request.user.is_customer and 
+            service_request.customer == request.user.customer and 
+            service_request.status == 'COMPLETED' and 
+            not Review.objects.filter(service_request=service_request).exists()):
+        return redirect('service_requests_list')
+    
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.service_request = service_request
+            review.customer = request.user.customer
+            review.service = service_request.service
+            review.save()
+            return redirect('service_request_detail', request_id=request_id)
     else:
-        form = ServiceRequestForm()
+        form = ReviewForm()
     
-    context = {
+    return render(request, 'services/create_review.html', {
         'form': form,
-        'service': service,
-    }
-    
-    return render(request, 'services/request_service.html', context)
-
-
-def services_by_category(request, category):
-    """
-    Display services filtered by category
-    """
-    # Validate category
-    valid_categories = [choice[0] for choice in Service.FIELD_CHOICES]
-    if category not in valid_categories:
-        messages.error(request, "Invalid category.")
-        return redirect('services:service_list')
-    
-    services = Service.objects.filter(field=category).order_by('-date')
-    
-    # Pagination
-    paginator = Paginator(services, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'services': page_obj,
-        'category': category,
-        'total_services': services.count(),
-    }
-    
-    return render(request, 'services/category_services.html', context)
-
-
-def most_requested_services(request):
-    """
-    Display most requested services
-    """
-    from django.db.models import Count
-    
-    # Get services with request count, ordered by most requested
-    services = Service.objects.annotate(
-        request_count=Count('service_requests')
-    ).filter(request_count__gt=0).order_by('-request_count')
-    
-    # Pagination
-    paginator = Paginator(services, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'services': page_obj,
-        'total_services': services.count(),
-    }
-    
-    return render(request, 'services/most_requested.html', context)
+        'service_request': service_request
+    })
